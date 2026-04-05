@@ -498,8 +498,8 @@ Formats designed for specific industries, data types, or application domains.
 - [Benchmarking Apache Arrow Flight](https://dl.acm.org/doi/fullHtml/10.1145/3527199.3527264) - ACM Conference Paper
 - [Evaluating Serialization Formats for Space-Efficient Storage](https://science.lpnu.ua/sites/default/files/journal-paper/2024/jun/35114/vse200624doi-11-17.pdf) - 2024 study
 
-- [eishay/jvm-serializers](https://github.com/eishay/jvm-serializers) - JVM serialization benchmarks
-- [ProgrammerAL/SerializationBenchmarks](https://github.com/ProgrammerAL/SerializationBenchmarks) - C#/.NET benchmarks
+- [eishay/jvm-serializers](https://github.com/eishay/jvm-serializers) - JVM serialization
+- [ProgrammerAL/SerializationBenchmarks](https://github.com/ProgrammerAL/SerializationBenchmarks) - C#/.NET
 
 ---
 
