@@ -1,6 +1,6 @@
 # Awesome Serialization & Deserialization [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 
-> A curated list of data serialization formats, libraries, tools, and resources with objective benchmarks, standards references, and real-world applications.
+> A curated list of data serialization formats, libraries, tools, and resources across programming languages and use cases.
 
 **Serialization** is the process of converting data structures or objects into a format suitable for storage or transmission. **Deserialization** reconstructs the original data from the serialized format. These processes are foundational to data persistence, network communication, distributed systems, and cross-platform interoperability.
 
@@ -31,15 +31,8 @@
   - [Scientific & Research](#scientific--research)
   - [Graph Data](#graph-data)
   - [Workflow Management](#workflow-management)
-- [Objective Benchmarks](#objective-benchmarks)
-  - [Performance Comparison](#performance-comparison)
-  - [Payload Size Comparison](#payload-size-comparison)
-  - [Memory Allocation](#memory-allocation)
-  - [Benchmark Methodology Notes](#benchmark-methodology-notes)
-- [Schema Evolution & Compatibility](#schema-evolution--compatibility)
-  - [Compatibility Modes](#compatibility-modes)
-  - [Evolution Rules by Format](#evolution-rules-by-format)
-- [Security Considerations](#security-considerations)
+  - [Schema Evolution](#schema-evolution)
+  - [Security Considerations](#security-considerations)
   - [Known Vulnerabilities](#known-vulnerabilities)
   - [Documented CVEs](#documented-cves)
   - [Mitigation Strategies](#mitigation-strategies)
@@ -51,7 +44,6 @@
 - [Learning Resources](#learning-resources)
   - [Technical Documentation](#technical-documentation)
   - [Research Papers](#research-papers)
-  - [Benchmark Repositories](#benchmark-repositories)
 - [Related Awesome Lists](#related-awesome-lists)
 
 ---
@@ -145,7 +137,7 @@ Formats designed for specific industries, data types, or application domains.
 | **[Jackson](https://github.com/FasterXML/jackson)** | JSON, Smile, CBOR, YAML, XML | Apache 2.0 | Most widely-used Java serialization | [GitHub](https://github.com/FasterXML/jackson) |
 | **[Gson](https://github.com/google/gson)** | JSON | Apache 2.0 | Google's JSON library for Java | [GitHub](https://github.com/google/gson) |
 | **[Moshi](https://github.com/square/moshi)** | JSON | Apache 2.0 | Modern JSON library by Square | [GitHub](https://github.com/square/moshi) |
-| **[dsl-json](https://github.com/ngs-doo/dsl-json)** | JSON | BSD-3 | Fastest Java JSON library (per benchmark) | [GitHub](https://github.com/ngs-doo/dsl-json) |
+| **[dsl-json](https://github.com/ngs-doo/dsl-json)** | JSON | BSD-3 | High-performance Java JSON library | [GitHub](https://github.com/ngs-doo/dsl-json) |
 | **[Kryo](https://github.com/EsotericSoftware/kryo)** | Binary | BSD-3 | Fast, efficient Java serialization | [GitHub](https://github.com/EsotericSoftware/kryo) |
 | **[protobuf-java](https://github.com/protocolbuffers/protobuf)** | Protocol Buffers | BSD-3 | Official Java protobuf | [GitHub](https://github.com/protocolbuffers/protobuf) |
 | **[Avro Java](https://avro.apache.org/docs/current/gettingstartedjava.html)** | Avro | Apache 2.0 | Apache Avro for Java | [Docs](https://avro.apache.org/docs/current/gettingstartedjava.html) |
@@ -337,111 +329,7 @@ Formats designed for specific industries, data types, or application domains.
 
 ---
 
-## Objective Benchmarks
-
-### Performance Comparison
-
-**Benchmark 1: Go Language (JSON vs MessagePack vs Protobuf)**
-*Source: [dev.to benchmark](https://dev.to/devflex-pro/json-vs-messagepack-vs-protobuf-in-go-my-real-benchmarks-and-what-they-mean-in-production-48fh)*
-
-| Format | Encode (ns/op) | Decode (ns/op) | Encode Speed (vs JSON) | Decode Speed (vs JSON) |
-|--------|----------------|----------------|------------------------|------------------------|
-| JSON | 42,000 | 68,000 | 1× (baseline) | 1× (baseline) |
-| MessagePack | 12,000 | 19,000 | 3.5× faster | 3.5× faster |
-| Protobuf | 6,500 | 9,000 | 6.5× faster | 7.5× faster |
-
-**Benchmark 2: Java (Avro vs Protobuf)**
-*Source: [SoftwareMill comparison](https://softwaremill.com/data-serialization-tools-comparison-avro-vs-protobuf/)*
-*Environment: Ubuntu 22.04.2, Intel i9-11900H @ 2.50 GHz, 64GB DDR4, OpenJDK 17.0.5, JMH*
-
-| Dataset Size | Protobuf Throughput | Avro Throughput | Protobuf Size | Avro Size |
-|--------------|---------------------|-----------------|---------------|-----------|
-| 1 book | Higher | Lower | 56 bytes | 54 bytes |
-| 10 books | Higher | Lower | 479 bytes | 441 bytes |
-| 1,000 books | Higher | Lower | 55,441 bytes | 51,508 bytes |
-| 1,000,000 books | Higher | Lower | 68,539,057 bytes | 64,547,317 bytes |
-
-*Finding: Protobuf has faster serialization/deserialization; Avro produces 5-8% smaller payloads.*
-
-**Benchmark 3: C# (.NET - JSON vs Protobuf vs MessagePack vs Bebop)**
-*Source: [SerializationBenchmarks (GitHub)](https://github.com/ProgrammerAL/SerializationBenchmarks)*
-*Framework: .NET with BenchmarkDotNet*
-
-| Object Type | JSON Size | Protobuf Size | MessagePack Size | Bebop Message | Bebop Struct |
-|-------------|-----------|---------------|------------------|---------------|--------------|
-| Tiny (2 int) | 27 bytes | 6 bytes | 7 bytes | 15 bytes | 8 bytes |
-| Simple (2 int, 1 string, 1 enum) | 83 bytes | 42 bytes | 42 bytes | 57 bytes | 48 bytes |
-| Complex (nested collections) | 83 bytes | 306 bytes | 279 bytes | 243 bytes | 201 bytes |
-
-*Finding: Protobuf is most compact for small objects; Bebop Struct scales best for complex objects.*
-
-**Benchmark 4: Embedded Platform (Protobuf vs Cap'n Proto vs FlatBuffers)**
-*Source: [pkok.github.io benchmark](https://pkok.github.io/2020/01/28/)*
-*Platform: Laptop (high-end) and UDOO (ARM-based embedded)*
-
-| Serializer | Object Size | Time (Laptop) | Time (UDOO) | UDOO/Laptop Ratio |
-|------------|-------------|---------------|-------------|-------------------|
-| Protobuf (serialize/deserialize only) | 16,116 bytes | 30,041 ms | 89,314 ms | 2.97× |
-| Cap'n Proto (full lifecycle) | 17,768 bytes | 4,512 ms | 15,054 ms | 2.71× |
-| FlatBuffers (full lifecycle) | 17,632 bytes | 5,821 ms | 15,752 ms | 3.34× |
-
-*Finding: Cap'n Proto and FlatBuffers outperform Protobuf by 3-4× when measured on full build-serialize-deserialize lifecycle. Cap'n Proto is fastest; FlatBuffers trails by ~4.6%.*
-
-**Benchmark 5: JavaScript (Avro vs JSON)**
-*Source: [adelost/javascript-serialization-benchmark](https://github.com/Adelost/javascript-serialization-benchmark)*
-
-| Format | Relative Speed | Notes |
-|--------|----------------|-------|
-| avsc (Avro) | 8-12× faster than native JSON | Fastest of all tested implementations |
-| msgpackr | Faster than JSON | Good performance improvement |
-
-### Payload Size Comparison
-
-| Format | Relative Size (vs JSON) | Typical Compression | Schema Overhead | Links to Benchmarks |
-|--------|------------------------|---------------------|-----------------|---------------------|
-| **JSON** | 100% (baseline) | None | N/A | - |
-| **MessagePack** | 55-70% | 30-45% reduction | No schema | [Benchmark](https://dev.to/devflex-pro/json-vs-messagepack-vs-protobuf-in-go-my-real-benchmarks-and-what-they-mean-in-production-48fh) |
-| **CBOR** | 60-75% | 25-40% reduction | No schema | [RFC 8949](https://datatracker.ietf.org/doc/html/rfc8949) |
-| **BSON** | 80-100% | 0-20% reduction | No schema (adds type metadata) | [bsonspec.org](https://bsonspec.org/) |
-| **Protocol Buffers** | 20-50% | 50-80% reduction | Schema separate | [Benchmark](https://softwaremill.com/data-serialization-tools-comparison-avro-vs-protobuf/) |
-| **Avro** | 20-50% | 50-80% reduction | Schema separate or embedded | [Benchmark](https://softwaremill.com/data-serialization-tools-comparison-avro-vs-protobuf/) |
-| **FlatBuffers** | 30-50% | 50-70% reduction | Schema required | [Benchmark](https://pkok.github.io/2020/01/28/) |
-| **Cap'n Proto** | 30-50% | 50-70% reduction | Schema required | [Benchmark](https://pkok.github.io/2020/01/28/) |
-| **Apache Arrow** | Variable | Columnar compression | Schema in metadata | [Arrow docs](https://arrow.apache.org/) |
-| **YAML** | 100-150% | Same or larger than JSON | No schema | - |
-| **XML** | 150-300% | 2-3× larger than JSON | Optional XSD | - |
-
-### Memory Allocation
-
-| Format | Allocation Pattern | GC Pressure | Reflection Usage | Notes |
-|--------|-------------------|-------------|------------------|-------|
-| **JSON (Go)** | High | High | 30-45% CPU time | String-based parsing causes overhead |
-| **MessagePack (Go)** | Moderate | Moderate | Near-zero | Type-specific binary encoding |
-| **Protobuf (Go)** | Near-zero | Low | Near-zero | CPU-bound, predictable footprint |
-| **MessagePack (C#)** | Lowest | Lowest | N/A | Minimal during ser/deser |
-| **Protobuf (C#)** | Highest (deser) | High | N/A | Increases GC pressure |
-| **Bebop (C#)** | High (ser), Low (deser) | Moderate | N/A | Struct type most efficient |
-
-### Benchmark Methodology Notes
-
-⚠️ **Important Considerations:**
-- Benchmarks are **language-specific** and **implementation-dependent**; results vary across languages and libraries
-- Performance depends on **data size**, **data complexity**, **schema design**, and **hardware**
-- **Micro-benchmarks** may not reflect production workloads
-- **Zero-copy formats** (FlatBuffers, Cap'n Proto) show advantages in read-heavy workloads
-- **Columnar formats** (Parquet, Arrow) excel in analytical queries, not transactional workloads
-- Always **benchmark with your actual data** before making format decisions
-
-**Benchmark Repositories:**
-- [eishay/jvm-serializers](https://github.com/eishay/jvm-serializers) - JVM serialization benchmarks (Java)
-- [ProgrammerAL/SerializationBenchmarks](https://github.com/ProgrammerAL/SerializationBenchmarks) - Multi-format benchmarks (C#/.NET)
-- [kcchu/buffer-benchmarks](https://github.com/kcchu/buffer-benchmarks) - Protobuf, FlatBuffers, Cap'n Proto (Go, Rust)
-- [Adelost/javascript-serialization-benchmark](https://github.com/Adelost/javascript-serialization-benchmark) - JavaScript benchmarks
-- [pkok.github.io/2020/01/28/](https://pkok.github.io/2020/01/28/) - Embedded platform benchmark
-
----
-
-## Schema Evolution & Compatibility
+## Schema Evolution
 
 ### Compatibility Modes
 
@@ -610,14 +498,8 @@ Formats designed for specific industries, data types, or application domains.
 - [Benchmarking Apache Arrow Flight](https://dl.acm.org/doi/fullHtml/10.1145/3527199.3527264) - ACM Conference Paper
 - [Evaluating Serialization Formats for Space-Efficient Storage](https://science.lpnu.ua/sites/default/files/journal-paper/2024/jun/35114/vse200624doi-11-17.pdf) - 2024 study
 
-### Benchmark Repositories
-
-- [eishay/jvm-serializers](https://github.com/eishay/jvm-serializers) - Comprehensive JVM serialization benchmarks
-- [ProgrammerAL/SerializationBenchmarks](https://github.com/ProgrammerAL/SerializationBenchmarks) - C#/.NET multi-format benchmarks
-- [kcchu/buffer-benchmarks](https://github.com/kcchu/buffer-benchmarks) - Protobuf vs FlatBuffers vs Cap'n Proto (Go, Rust)
-- [Adelost/javascript-serialization-benchmark](https://github.com/Adelost/javascript-serialization-benchmark) - JavaScript serialization comparison
-- [Serialization Benchmark Collection](https://github.com/dlang/dub/wiki/Benchmarking) - D language benchmarks
-- [pkok.github.io benchmark analysis](https://pkok.github.io/2020/01/28/) - Embedded platform comparison
+- [eishay/jvm-serializers](https://github.com/eishay/jvm-serializers) - JVM serialization benchmarks
+- [ProgrammerAL/SerializationBenchmarks](https://github.com/ProgrammerAL/SerializationBenchmarks) - C#/.NET benchmarks
 
 ---
 
@@ -639,12 +521,10 @@ Formats designed for specific industries, data types, or application domains.
 Contributions are welcome! Please submit a Pull Request or open an Issue to suggest additions or changes.
 
 **Contribution Guidelines:**
-- Include objective data (benchmarks, specifications, standards references) where possible
 - Provide links to official documentation, RFCs, or specifications
 - Note security implications when relevant
 - Specify licenses for libraries
 - Indicate language/version compatibility
-- Avoid subjective claims like "best" or "fastest" without citing benchmark sources
 
 ---
 
